@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import Restaurants from '../components/Restaurants'
+import RestaurantService from '../services/restaurant.service'
+import Swal from "sweetalert2"
 
 const Home = () => {
 
@@ -8,29 +10,24 @@ const Home = () => {
   const [filteredRestaurant, setFilteredRestaurant] = useState([])
 
   useEffect(() => {
+// call api: GetAllRestaurants
 
-    // call api: GetAllRestaurants
-    fetch('http://localhost:5000/api/v1/restaurant')
-    .then((res) => {
-      // convert to json format
-      return res.json()
-    })
-    .then((resp) => {
-      // save to state
-      console.log(resp)
-      setRestaurants(resp)
-      setFilteredRestaurant(resp)
-    })
-    .catch((e) => {
-      // catch error
-      console.log(e.message)
-    })
-
-  }, [])
-
-  const handleSearch = (keyword) => {
-    if (keyword === '') {
-      setFilteredRestaurant(restaurants)
+const getAllRestaurant = async ()=> {
+  try{
+    const response = RestaurantService.getAllRestaurant();
+    if(response.status === 200){
+      setRestaurants(response.data);
+      setFilteredRestaurant(response.data);
+    }
+  } catch (error) {
+    Swal.fire({
+      title:"Get All Restaurant",
+      text: error?.response?.data?.message || error.message,
+    });
+  }
+};
+  getAllRestaurant();
+},[]);
       return;
     }
 
@@ -42,7 +39,7 @@ const Home = () => {
     })
     setFilteredRestaurant(result)
     // console.log(result)
-  }
+
 
   return (
     <div className='container mx-auto'>
@@ -73,6 +70,6 @@ const Home = () => {
       <Restaurants restaurants={filteredRestaurant} />
     </div>
   )
-}
+
 
 export default Home
