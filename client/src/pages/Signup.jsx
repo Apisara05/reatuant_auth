@@ -1,51 +1,45 @@
 import { useState } from "react";
 import AuthService from "../services/auth.service";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"; //
 import { useNavigate } from "react-router";
 
 const Signup = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState({
+  const [signup, setSignup] = useState({
     username: "",
     name: "",
     password: "",
     email: "",
   });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser((user) => ({ ...user, [name]: value }));
+    setSignup((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // ✅ ป้องกัน reload หน้า
+
     try {
-      // async await
-      const newUser = await AuthService.register(
-        user.username,
-        user.name,
-        user.email,
-        user.password
+      const response = await AuthService.register(
+        signup.username,
+        signup.name,
+        signup.password,
+        signup.email
       );
 
-      if (newUser.status === 200) {
+      if (response.status === 200) {
         Swal.fire({
-          title: "Register",
-          // newUser.data.message ได้จากหลังบ้าน
-          text: newUser.data.message,
+          title: "User Register",
+          text: "Register successfully",
           icon: "success",
         }).then(() => {
-          setUser({
-            username: "",
-            name: "",
-            password: "",
-            email: "",
-          });
-          navigate("/");
+          navigate("/signin"); // ✅ สมัครเสร็จแล้วไปหน้า signin ดีกว่า
         });
       }
     } catch (error) {
       Swal.fire({
-        title: "Register",
+        title: "User Register",
         text: error?.response?.data?.message || error.message,
         icon: "error",
       });
@@ -56,13 +50,11 @@ const Signup = () => {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6 py-12">
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-md">
         <div className="text-center">
-          <h2 className="mt-6 text-2xl font-bold text-gray-800">
-            {" "}
-            🍴 สมัครสมาชิก 🍴{" "}
-          </h2>
+          <h2 className="mt-6 text-2xl font-bold text-gray-800">Register</h2>
         </div>
 
-        <form className="space-y-6">
+        {/* ✅ ใช้ onSubmit ที่ form */}
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="username"
@@ -77,10 +69,11 @@ const Signup = () => {
               autoComplete="username"
               required
               onChange={handleChange}
-              value={user.username}
+              value={signup.username}
               className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
+
           <div>
             <label
               htmlFor="name"
@@ -92,10 +85,10 @@ const Signup = () => {
               id="name"
               name="name"
               type="text"
-              autoComplete="username"
+              autoComplete="name"
               required
               onChange={handleChange}
-              value={user.name}
+              value={signup.name}
               className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
@@ -111,10 +104,10 @@ const Signup = () => {
               id="password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
               onChange={handleChange}
-              value={name.password}
+              value={signup.password}
               className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
@@ -130,29 +123,18 @@ const Signup = () => {
               id="email"
               name="email"
               type="email"
-              autoComplete="current-password"
+              autoComplete="email"
               required
               onChange={handleChange}
-              value={name.email}
+              value={signup.email}
               className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
-              >
-                Forgot password?
-              </a>
-            </div>
-          </div>
-
           <div>
+            {/* ✅ ไม่ต้องใส่ onClick */}
             <button
-              type="button"
-              onClick={handleSubmit}
+              type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
             >
               Sign up
@@ -161,7 +143,7 @@ const Signup = () => {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          Have a account?{" "}
+          Have an account?{" "}
           <a
             href="/signin"
             className="font-medium text-indigo-600 hover:text-indigo-500"

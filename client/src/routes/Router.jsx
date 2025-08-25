@@ -1,15 +1,13 @@
 import { createBrowserRouter } from "react-router";
-
-import AddRestaurant from "../pages/AddRestaurant";
 import Home from "../pages/Home";
+import AddRestaurant from "../pages/AddRestaurant";
 import Update from "../pages/Update";
-import Signin from "../pages/Signin";
 import Signup from "../pages/Signup";
-import NotAllowed from "../pages/NotAllowed";
+import Signin from "../pages/Signin";
 import AdminPage from "../pages/AdminPage";
-import UserPage from "../pages/UserPage";
+import NotAllowed from "../pages/NotAllowed";
+import AdminandModerator from "../pages/AdminandModerator";
 import Profile from "../pages/Profile";
-import AdminAndModerator from "../pages/AdminAndModerator";
 
 const router = createBrowserRouter([
   {
@@ -17,15 +15,7 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: "/update/:id",
-    element: (
-      <AdminAndModerator>
-        <Update />
-      </AdminAndModerator>
-    ),
-  },
-  {
-    path: "/add",
+    path: "/AddRestaurant",
     element: (
       <AdminPage>
         <AddRestaurant />
@@ -33,24 +23,28 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/signin",
-    element: <Signin />,
+    path: "/Update/:id",
+    element: (
+      <AdminandModerator>
+        <Update />
+      </AdminandModerator>
+    ),
   },
   {
-    path: "/signup",
+    path: "/Signup",
     element: <Signup />,
   },
   {
-    path: "/notallowed",
+    path: "/Signin",
+    element: <Signin />,
+  },
+  {
+    path: "/NotAllowed",
     element: <NotAllowed />,
   },
   {
-    path: "/profile",
-    element: (
-      <UserPage>
-        <Profile />
-      </UserPage>
-    ),
+    path: "/Profile",
+    element: <Profile />,
   },
 ]);
 

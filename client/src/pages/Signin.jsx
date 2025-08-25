@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import AuthService from "../services/auth.service";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router";
+import Swal from "sweetalert2"; // 
+import { useNavigate } from "react-router-dom"; // ต้องเป็น react-router-dom
 import { useAuthContext } from "../context/AuthContext";
 
 const Signin = () => {
@@ -9,37 +9,32 @@ const Signin = () => {
     username: "",
     password: "",
   });
-
   const navigate = useNavigate();
-
-  // : rename
   const { login: loginFn, user } = useAuthContext();
 
   useEffect(() => {
     if (user) {
       navigate("/");
     }
-  }, [user]);
+  }, [user, navigate]);
 
   const handleChange = (e) => {
-    // how to rename must to use : เช่น name: newName
-    const { name, value } = e.target; // destructure object
-    // ... spread operator
-    // ...signin copy ค่าเดิม [name]: value ค่าใหม่
-    setSignin({ ...signin, [name]: value });
+    const { name, value } = e.target;
+    setSignin((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // หยุด form reload
+
     try {
       const currentUser = await AuthService.login(
         signin.username,
         signin.password
       );
-
       if (currentUser.status === 200) {
         Swal.fire({
           title: "User Login",
-          text: "Login Successfully!",
+          text: "Login successfully",
           icon: "success",
         }).then(() => {
           loginFn(currentUser.data);
@@ -60,11 +55,12 @@ const Signin = () => {
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-md">
         <div className="text-center">
           <h2 className="mt-6 text-2xl font-bold text-gray-800">
-            🍴 เข้าสู่ระบบ 🍴
+            Sign in to your account
           </h2>
         </div>
 
-        <form>
+        {/* ✅ เพิ่ม onSubmit ที่ form */}
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="username"
@@ -79,7 +75,6 @@ const Signin = () => {
               autoComplete="username"
               required
               onChange={handleChange}
-              // sync two way
               value={signin.username}
               className="mt-2 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
             />
@@ -116,10 +111,10 @@ const Signin = () => {
           </div>
 
           <div>
+            {/* ✅ เอา onClick ออก เหลือแค่ type="submit" */}
             <button
-              type="button"
+              type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
-              onClick={handleSubmit}
             >
               Sign in
             </button>
@@ -132,7 +127,7 @@ const Signin = () => {
             href="/signup"
             className="font-medium text-indigo-600 hover:text-indigo-500"
           >
-            Start a 14 day free trial
+            Sign up Now!!
           </a>
         </p>
       </div>

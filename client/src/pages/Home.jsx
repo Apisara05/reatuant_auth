@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import Navbar from "../components/Navbar";
-import Restaurants from "../components/Restaurants";
-import Swal from "sweetalert2";
-import RestaurantService from "../services/retaurant.service";
-
+import Restaurant from "../components/Restaurant";
+import swal from "sweetalert2";
+import RestaurantService from "../services/restaurant.service";
 const Home = () => {
-  const [restaurants, setRestaurants] = useState([]);
-  const [filteredRestaurant, setFilteredRestaurant] = useState([]);
-
+  const [Restaurants, setRestaurants] = useState([]);
+  const [filteredRestaurant, setFiltedRestauranrt] = useState([]);
   useEffect(() => {
+    //call api getAllRestaurants
     const getAllRestaurant = async () => {
       try {
         const response = await RestaurantService.getAllRestaurants();
+
         if (response.status === 200) {
           setRestaurants(response.data);
-          setFilteredRestaurant(response.data);
+          setFiltedRestauranrt(response.data);
         }
       } catch (error) {
-        Swal.fire({
-          title: "เกิดข้อผิดพลาด",
-          icon: "error",
+        // catch error
+        swal.fire({
+          title: "Get all restaurant",
           text: error?.response?.data?.message || error.message,
         });
       }
@@ -29,40 +29,30 @@ const Home = () => {
 
   const handleSearch = (keyword) => {
     if (keyword === "") {
-      setFilteredRestaurant(restaurants);
       return;
     }
-
-    const result = restaurants.filter((restaurant) => {
+    const Results = Restaurants.filter((Restaurant) => {
       return (
-        restaurant.name.toLowerCase().includes(keyword.toLowerCase()) ||
-        restaurant.type.toLowerCase().includes(keyword.toLowerCase())
+        Restaurant.name.toLowerCase().includes(keyword.toLocaleLowerCase()) ||
+        Restaurant.type.toLowerCase().includes(keyword.toLocaleLowerCase())
       );
     });
-    setFilteredRestaurant(result);
+
+    setFiltedRestauranrt(Results);
   };
-
   return (
-    <div className="min-h-screen bg-base-200">
-      {/* Navigation */}
-
-      {/* Header */}
-      <div className="hero bg-primary text-primary-content py-10">
-        <div className="hero-content text-center">
-          <div className="max-w-md">
-            <h1 className="text-5xl font-bold">
-              🍽️ รายการร้านอาหาร & เครื่องดื่ม
-            </h1>
-            <p className="py-6 text-lg">ค้นหาร้านอร่อยใกล้คุณได้ที่นี่</p>
-          </div>
-        </div>
+    <div className="container mx-auto">
+      {/*header*/}
+      <div>
+        <h1 className="title justify-center text-3xl text-center m-5 p-6">
+          Grab Restaurant
+        </h1>
       </div>
-
-      {/* Search Box */}
-      <div className="flex justify-center mt-8">
-        <label className="input input-bordered flex items-center gap-2 w-full max-w-xl">
+      {/*SearchBox*/}
+      <div className="mb-5 flex justify-center items-center ">
+        <label className="input flex items-center gap-2 w-3xl">
           <svg
-            className="h-5 w-5 opacity-50"
+            className="h-[1em] opacity-50"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
           >
@@ -79,17 +69,15 @@ const Home = () => {
           </svg>
           <input
             type="search"
-            placeholder="ค้นหาร้านอาหารหรือประเภทอาหาร..."
-            className="grow"
+            required
+            placeholder="Search"
             onChange={(e) => handleSearch(e.target.value)}
+            name="keyword"
           />
         </label>
       </div>
-
-      {/* Result */}
-      <div className="px-4 py-10">
-        <Restaurants restaurants={filteredRestaurant} />
-      </div>
+      {/*Results*/}
+      <Restaurant Restaurants={filteredRestaurant} />
     </div>
   );
 };

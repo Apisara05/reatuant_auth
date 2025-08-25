@@ -1,30 +1,23 @@
 import axios from "axios";
-import ToKenService from "./token.service";
+import TokenService from "./token.service"; // ✅ ชื่อไฟล์ควรสะกดตรงกัน
 
-const baseURL = import.meta.env.VITE_BASE_URL;
-
-const instance = axios.create({
-  baseURL: baseURL,
+const api = axios.create({
+  baseURL: "http://localhost:5000/api", // เปลี่ยน URL ตาม backend ของคุณ
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// ดักจับ request object
-// add interceptor to request object
-// use = middleware
-instance.interceptors.request.use(
+// interceptor ดัก token ก่อนยิง request
+api.interceptors.request.use(
   (config) => {
-    // recieve after logged in
-    const token = ToKenService.getLocalAccessToken();
+    const token = TokenService.getLocalAccessToken();
     if (token) {
-      config.headers["x-access-token"] = token;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-export default instance;
+export default api;
