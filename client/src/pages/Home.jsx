@@ -1,60 +1,61 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-import Restaurants from '../components/Restaurants'
-
+import React, { useState, useEffect, use } from "react";
+import Navbar from "../components/Navbar";
+import Restaurant from "../components/Restaurant";
+import swal from "sweetalert2";
+import RestaurantService from "../services/restaurant.service";
 const Home = () => {
-
-  const [restaurants, setRestaurants] = useState([])
-  const [filteredRestaurant, setFilteredRestaurant] = useState([])
-
+  const [Restaurants, setRestaurants] = useState([]);
+  const [filteredRestaurant, setFiltedRestauranrt] = useState([]);
   useEffect(() => {
+    //call api getAllRestaurants
+    const getAllRestaurant = async () => {
+      try {
+        const response = await RestaurantService.getAllRestaurants();
 
-    // call api: GetAllRestaurants
-    fetch('http://localhost:5000/api/v1/restaurant')
-    .then((res) => {
-      // convert to json format
-      return res.json()
-    })
-    .then((resp) => {
-      // save to state
-      console.log(resp)
-      setRestaurants(resp)
-      setFilteredRestaurant(resp)
-    })
-    .catch((e) => {
-      // catch error
-      console.log(e.message)
-    })
-
-  }, [])
+        if (response.status === 200) {
+          setRestaurants(response.data);
+          setFiltedRestauranrt(response.data);
+        }
+      } catch (error) {
+        // catch error
+        swal.fire({
+          title: "Get all restaurant",
+          text: error?.response?.data?.message || error.message,
+        });
+      }
+    };
+    getAllRestaurant();
+  }, []);
 
   const handleSearch = (keyword) => {
-    if (keyword === '') {
-      setFilteredRestaurant(restaurants)
+    if (keyword === "") {
       return;
     }
-
-    const result = restaurants.filter((restaurant) => {
+    const Results = Restaurants.filter((Restaurant) => {
       return (
-        restaurant.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-        restaurant.type.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
-      )
-    })
-    setFilteredRestaurant(result)
-    // console.log(result)
-  }
+        Restaurant.name.toLowerCase().includes(keyword.toLocaleLowerCase()) ||
+        Restaurant.type.toLowerCase().includes(keyword.toLocaleLowerCase())
+      );
+    });
 
+    setFiltedRestauranrt(Results);
+  };
   return (
-    <div className='container mx-auto'>
-      {/* Navigation */}
-      {/* Header */}
+    <div className="container mx-auto">
+      {/*header*/}
       <div>
-        <h1 className='justify-center text-3xl text-center m-5 p-5'>Grab Restaurant 666</h1>
+        <h1 className="title justify-center text-3xl text-center m-5 p-6">
+          Grab Restaurant
+        </h1>
       </div>
-      {/* Search Box */}
-      <div className='mb-5 flex justify-center items-center'>
-        <label className="input flex items-center gap-2 w-2xl">
-          <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      {/*SearchBox*/}
+      <div className="mb-5 flex justify-center items-center ">
+        <label className="input flex items-center gap-2 w-3xl">
+          <svg
+            className="h-[1em] opacity-50"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
             <g
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -66,13 +67,19 @@ const Home = () => {
               <path d="m21 21-4.3-4.3"></path>
             </g>
           </svg>
-          <input type="search" required placeholder="Search" name='keyword' onChange={(e) => handleSearch(e.target.value)} />
+          <input
+            type="search"
+            required
+            placeholder="Search"
+            onChange={(e) => handleSearch(e.target.value)}
+            name="keyword"
+          />
         </label>
       </div>
-      {/* Result */}
-      <Restaurants restaurants={filteredRestaurant} />
+      {/*Results*/}
+      <Restaurant Restaurants={filteredRestaurant} />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
